@@ -12,18 +12,47 @@
 
 @property (nonatomic, strong) UISegmentedControl *dayNightSymbolSeg;
 @property (nonatomic, strong) NSArray *dayNightSymbols;
+@property (nonatomic, assign) HourPeriod hourPeriod;
 
 @end
 
 @implementation WYYDateTime12HourPicker
 
 #pragma mark - Initilizer
-- (instancetype)initWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel{
-    self = [super initWithHeight:height hourFormat:hourFormat needConfirmCancel:needConfirmCancel];
+- (instancetype)initWithHeight:(CGFloat)height
+                    hourFormat:(HourFormat)hourFormat
+             needConfirmCancel:(BOOL)needConfirmCancel
+                     yearRange:(WYYYearRange)range
+                   initialDate:(NSDate *)initialDate{
+    NSAssert(hourFormat == HourFormat12, @"Hour format does not match class %@", [self class]);
+    
+    self = [super initWithHeight:height hourFormat:HourFormat12 needConfirmCancel:needConfirmCancel yearRange:range initialDate:initialDate];
     
     if (self) {
         [self configureDefaultValue];
         [self setupSubviews];
+        [self configureInitialDate:initialDate];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithHeight:(CGFloat)height
+                    hourFormat:(HourFormat)hourFormat
+             needConfirmCancel:(BOOL)needConfirmCancel
+                     yearRange:(WYYYearRange)range
+                   initialDate:(NSDate *)initialDate
+               valueDidChanged:(DateTimePickerValueDidChange)valueDidChange
+       selectedValueDidConfirm:(DateTimePickerSelectedValueDidConfirm)selectedValueDidConfirm
+        selectedValueDidCancel:(DateTimePickerSelectedValueDidCancel)selectedValueDidCancel{
+    NSAssert(hourFormat == HourFormat12, @"Hour format does not match class %@", [self class]);
+    
+    self = [super initWithHeight:height hourFormat:HourFormat12 needConfirmCancel:needConfirmCancel yearRange:range initialDate:initialDate valueDidChanged:valueDidChange selectedValueDidConfirm:selectedValueDidConfirm selectedValueDidCancel:selectedValueDidCancel];
+    
+    if (self) {
+        [self configureDefaultValue];
+        [self setupSubviews];
+        [self configureInitialDate:initialDate];
     }
     
     return self;
@@ -35,19 +64,74 @@
     
     [self addSubview:self.toolBar];
     self.pickerView.frame = CGRectMake(0, CGRectGetMaxY(self.toolBar.frame), CGRectGetWidth(self.pickerView.bounds), CGRectGetHeight(self.bounds) - CGRectGetHeight(self.toolBar.bounds));
-    
-    [self.dayNightSymbolSeg setSelectedSegmentIndex:0];
 }
 
 #pragma mark - Helpers
 
++ (NSUInteger)indexOfElement:(NSInteger)element inDateComponent:(NSArray *)component{
+    NSUInteger index = [component indexOfObject:[NSString stringWithFormat:@"%ld", (long)element]];
+    NSAssert(index != NSNotFound, @"Can not index initial date componet");
+    
+    return index;
+}
+
+- (void)configureInitialDate:(NSDate *)initialDate{
+    
+    NSUInteger yearIndex   = 0;
+    NSUInteger monthIndex  = 0;
+    NSUInteger dayIndex    = 0;
+    NSUInteger hourIndex   = 0;
+    NSUInteger minuteIndex = 0;
+    NSUInteger secondIndex = 0;
+    
+    if (initialDate) {
+        NSUInteger unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+        self.dateComponent = [CurrentCalendar components:unitFlags fromDate:initialDate];
+        
+        yearIndex  = [[self class] indexOfElement:self.dateComponent.year inDateComponent:self.years];
+        monthIndex = [[self class] indexOfElement:self.dateComponent.month inDateComponent:self.months];
+        dayIndex   = [[self class] indexOfElement:self.dateComponent.day inDateComponent:self.days];
+        
+        if (self.dateComponent.hour > 11) {
+            self.dateComponent.hour -= 12;
+            self.hourPeriod = HourPeriodNight;
+        } else {
+            self.hourPeriod = HourPeriodDay;
+        }
+        
+        hourIndex  = [[self class] indexOfElement:self.dateComponent.hour inDateComponent:self.hours];
+        minuteIndex = [[self class] indexOfElement:self.dateComponent.minute inDateComponent:self.minutes];
+        secondIndex = [[self class] indexOfElement:self.dateComponent.second inDateComponent:self.seconds];
+        
+        self.selectedDate = initialDate;
+    } else {
+        self.dateComponent.year   = [self.years[yearIndex] integerValue];
+        self.dateComponent.month  = [self.months[monthIndex] integerValue];
+        self.dateComponent.day    = [self.days[dayIndex] integerValue];
+        self.dateComponent.hour   = [self.hours[hourIndex] integerValue];
+        self.dateComponent.minute = [self.minutes[minuteIndex] integerValue];
+        self.dateComponent.second = [self.seconds[secondIndex] integerValue];
+        
+        self.selectedDate = [self generateLocalDateWithDateComponents:self.dateComponent];
+    }
+    
+    [self.pickerView selectRow:yearIndex inComponent:0 animated:YES];
+    [self.pickerView selectRow:monthIndex inComponent:1 animated:YES];
+    [self.pickerView selectRow:dayIndex inComponent:2 animated:YES];
+    [self.pickerView selectRow:hourIndex inComponent:3 animated:YES];
+    [self.pickerView selectRow:minuteIndex inComponent:5 animated:YES];
+    [self.pickerView selectRow:secondIndex inComponent:7 animated:YES];
+    [self.dayNightSymbolSeg setSelectedSegmentIndex:self.hourPeriod];
+}
+
 - (void)dayNightSwitchAction:(UISegmentedControl *)sender{
     
+    self.hourPeriod = (HourPeriod)sender.selectedSegmentIndex;
     [self pickerView:self.pickerView didSelectRow:0 inComponent:3];
-    
-    if ([self.dateTimeDelegate respondsToSelector:@selector(dateTimePicker:didChangeAMPM:)]) {
-        NSString *symbol = self.dayNightSymbols[sender.selectedSegmentIndex];
-        [self.dateTimeDelegate dateTimePicker:self didChangeAMPM:symbol];
+    if ([self.dateTimeDelegate respondsToSelector:@selector(dateTimePicker:didChangeAMPM:dateTime:)]) {
+        [self.dateTimeDelegate dateTimePicker:self didChangeAMPM:self.hourPeriod dateTime:self.selectedDate];
+    } else if (self.dateTimePickerValueAMPMDidChange) {
+        self.dateTimePickerValueAMPMDidChange(self, self.hourPeriod, self.selectedDate);
     }
 }
 
@@ -63,7 +147,7 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateFormat = [mutableDateFormat copy];
     
-    NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%ld%ld%ld%ld%ld%ld%@", dateComponents.year, dateComponents.month, dateComponents.day, dateComponents.hour, dateComponents.minute, dateComponents.second, self.dayNightSymbols[self.dayNightSymbolSeg.selectedSegmentIndex]]];
+    NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%ld%ld%ld%ld%ld%ld%@", (long)dateComponents.year, (long)dateComponents.month, dateComponents.day, dateComponents.hour, dateComponents.minute, dateComponents.second, self.dayNightSymbols[self.hourPeriod]]];
     self.selectedDate = date;
     
     return date;

@@ -7,9 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F95378C11D168D8A00E8BD2D /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F95378C01D168D8A00E8BD2D /* DetailViewController.m */; };
+		F95378C41D168E6A00E8BD2D /* DetailType1ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F95378C31D168E6A00E8BD2D /* DetailType1ViewController.m */; };
+		F95378C71D1696BB00E8BD2D /* DetailType2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F95378C61D1696BB00E8BD2D /* DetailType2ViewController.m */; };
+		F95378CD1D16D90800E8BD2D /* DetailType3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F95378CC1D16D90800E8BD2D /* DetailType3ViewController.m */; };
+		F95378D01D16D97000E8BD2D /* DetailType4ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F95378CF1D16D97000E8BD2D /* DetailType4ViewController.m */; };
 		F95F7F1F1D0C563900084E7E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F95F7F1E1D0C563900084E7E /* main.m */; };
 		F95F7F221D0C563900084E7E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F95F7F211D0C563900084E7E /* AppDelegate.m */; };
-		F95F7F251D0C563900084E7E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F95F7F241D0C563900084E7E /* ViewController.m */; };
 		F95F7F281D0C563900084E7E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F95F7F261D0C563900084E7E /* Main.storyboard */; };
 		F95F7F2A1D0C563900084E7E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F95F7F291D0C563900084E7E /* Assets.xcassets */; };
 		F95F7F2D1D0C563900084E7E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F95F7F2B1D0C563900084E7E /* LaunchScreen.storyboard */; };
@@ -38,12 +42,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F95378BF1D168D8A00E8BD2D /* DetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
+		F95378C01D168D8A00E8BD2D /* DetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
+		F95378C21D168E6A00E8BD2D /* DetailType1ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailType1ViewController.h; sourceTree = "<group>"; };
+		F95378C31D168E6A00E8BD2D /* DetailType1ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailType1ViewController.m; sourceTree = "<group>"; };
+		F95378C51D1696BB00E8BD2D /* DetailType2ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailType2ViewController.h; sourceTree = "<group>"; };
+		F95378C61D1696BB00E8BD2D /* DetailType2ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailType2ViewController.m; sourceTree = "<group>"; };
+		F95378CB1D16D90800E8BD2D /* DetailType3ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailType3ViewController.h; sourceTree = "<group>"; };
+		F95378CC1D16D90800E8BD2D /* DetailType3ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailType3ViewController.m; sourceTree = "<group>"; };
+		F95378CE1D16D97000E8BD2D /* DetailType4ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailType4ViewController.h; sourceTree = "<group>"; };
+		F95378CF1D16D97000E8BD2D /* DetailType4ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailType4ViewController.m; sourceTree = "<group>"; };
 		F95F7F1A1D0C563900084E7E /* DateTimePicker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DateTimePicker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F95F7F1E1D0C563900084E7E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F95F7F201D0C563900084E7E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		F95F7F211D0C563900084E7E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		F95F7F231D0C563900084E7E /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		F95F7F241D0C563900084E7E /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		F95F7F271D0C563900084E7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F95F7F291D0C563900084E7E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F95F7F2C1D0C563900084E7E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -113,8 +125,16 @@
 			children = (
 				F95F7F201D0C563900084E7E /* AppDelegate.h */,
 				F95F7F211D0C563900084E7E /* AppDelegate.m */,
-				F95F7F231D0C563900084E7E /* ViewController.h */,
-				F95F7F241D0C563900084E7E /* ViewController.m */,
+				F95378BF1D168D8A00E8BD2D /* DetailViewController.h */,
+				F95378C01D168D8A00E8BD2D /* DetailViewController.m */,
+				F95378C21D168E6A00E8BD2D /* DetailType1ViewController.h */,
+				F95378C31D168E6A00E8BD2D /* DetailType1ViewController.m */,
+				F95378C51D1696BB00E8BD2D /* DetailType2ViewController.h */,
+				F95378C61D1696BB00E8BD2D /* DetailType2ViewController.m */,
+				F95378CB1D16D90800E8BD2D /* DetailType3ViewController.h */,
+				F95378CC1D16D90800E8BD2D /* DetailType3ViewController.m */,
+				F95378CE1D16D97000E8BD2D /* DetailType4ViewController.h */,
+				F95378CF1D16D97000E8BD2D /* DetailType4ViewController.m */,
 				F95F7F261D0C563900084E7E /* Main.storyboard */,
 				F95F7F291D0C563900084E7E /* Assets.xcassets */,
 				F95F7F2B1D0C563900084E7E /* LaunchScreen.storyboard */,
@@ -153,12 +173,12 @@
 		F95F7F501D0C564500084E7E /* WYYDateTimePicker */ = {
 			isa = PBXGroup;
 			children = (
+				F95F7F551D0C564500084E7E /* WYYDateTimePicker.h */,
+				F95F7F561D0C564500084E7E /* WYYDateTimePicker.m */,
 				F95F7F511D0C564500084E7E /* WYYDateTime12HourPicker.h */,
 				F95F7F521D0C564500084E7E /* WYYDateTime12HourPicker.m */,
 				F95F7F531D0C564500084E7E /* WYYDateTime24HourPicker.h */,
 				F95F7F541D0C564500084E7E /* WYYDateTime24HourPicker.m */,
-				F95F7F551D0C564500084E7E /* WYYDateTimePicker.h */,
-				F95F7F561D0C564500084E7E /* WYYDateTimePicker.m */,
 			);
 			path = WYYDateTimePicker;
 			sourceTree = "<group>";
@@ -295,10 +315,14 @@
 			files = (
 				F95F7F5B1D0C564500084E7E /* WYYDateTimePicker.m in Sources */,
 				F95F7F5A1D0C564500084E7E /* WYYDateTime24HourPicker.m in Sources */,
-				F95F7F251D0C563900084E7E /* ViewController.m in Sources */,
+				F95378D01D16D97000E8BD2D /* DetailType4ViewController.m in Sources */,
+				F95378C71D1696BB00E8BD2D /* DetailType2ViewController.m in Sources */,
+				F95378C11D168D8A00E8BD2D /* DetailViewController.m in Sources */,
 				F95F7F591D0C564500084E7E /* WYYDateTime12HourPicker.m in Sources */,
 				F95F7F221D0C563900084E7E /* AppDelegate.m in Sources */,
+				F95378CD1D16D90800E8BD2D /* DetailType3ViewController.m in Sources */,
 				F95F7F1F1D0C563900084E7E /* main.m in Sources */,
+				F95378C41D168E6A00E8BD2D /* DetailType1ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -522,6 +546,7 @@
 				F95F7F491D0C563A00084E7E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F95F7F4A1D0C563A00084E7E /* Build configuration list for PBXNativeTarget "DateTimePickerTests" */ = {
 			isa = XCConfigurationList;
@@ -530,6 +555,7 @@
 				F95F7F4C1D0C563A00084E7E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F95F7F4D1D0C563A00084E7E /* Build configuration list for PBXNativeTarget "DateTimePickerUITests" */ = {
 			isa = XCConfigurationList;
@@ -538,6 +564,7 @@
 				F95F7F4F1D0C563A00084E7E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

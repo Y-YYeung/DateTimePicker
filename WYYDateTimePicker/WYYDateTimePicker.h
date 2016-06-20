@@ -15,12 +15,36 @@ static const CGFloat YearComponentWidth  = 68.f;
 static const CGFloat TimeSeparatorWidth  = 14.f;
 static const CGFloat OtherComponentWidth = 40.f;
 
+typedef struct _WYYYearRange {
+    NSInteger startYear;
+    NSInteger endYear;
+} WYYYearRange;
+
+NS_INLINE WYYYearRange WYYMakeYearRange(NSInteger startYear, NSInteger endYear) {
+    WYYYearRange r;
+    r.startYear = startYear;
+    r.endYear = endYear;
+    return r;
+}
+
 typedef enum : NSUInteger {
     HourFormat12,
     HourFormat24,
 } HourFormat;
 
+typedef enum : NSUInteger {
+    HourPeriodDay,
+    HourPeriodNight,
+} HourPeriod;
+
+
 @class WYYDateTimePicker;
+
+typedef void(^DateTimePickerValueAMPMDidChange)(WYYDateTimePicker *dateTimePicker, HourPeriod hourPeriod, NSDate *dateTime);
+typedef void(^DateTimePickerValueDidChange)(WYYDateTimePicker *dateTimePicker, NSDate *dateTime);
+typedef void(^DateTimePickerSelectedValueDidConfirm)(WYYDateTimePicker *dateTimePicker, NSDate *dateTime);
+typedef void(^DateTimePickerSelectedValueDidCancel)(WYYDateTimePicker *datetimePicker, NSDate *dateTime);
+
 @protocol WYYDateTimePickerDelegate <NSObject>
 
 @optional
@@ -32,9 +56,10 @@ typedef enum : NSUInteger {
  *  @brief Called when the day/night is switched. Usable when the concrete instance is class of WYYDateTime12HourPicker.
  *
  *  @param dateTimePicker The manipulated DateTimePicker.
- *  @param symbol         A string of 'AM' or 'PM'
+ *  @param hourPeriod     Indicates that day or night the time represents.
+ *  @param dateTime       The selected dateTime when change the day/night symbol.
  */
-- (void)dateTimePicker:(WYYDateTimePicker *)dateTimePicker didChangeAMPM:(NSString *)symbol;
+- (void)dateTimePicker:(WYYDateTimePicker *)dateTimePicker didChangeAMPM:(HourPeriod)hourPeriod dateTime:(NSDate *)dateTime;
 
 /**
  *  @author YYYeung
@@ -64,16 +89,9 @@ typedef enum : NSUInteger {
 /**
  *  @author YYYeung
  *
- *  @brief Start of the range of year.
+ *  @brief The range of choices of year.
  */
-@property (nonatomic, assign) NSInteger startYear;
-
-/**
- *  @author YYYeung
- *
- *  @brief End of the range of year.
- */
-@property (nonatomic, assign) NSInteger endYear;
+@property (nonatomic, assign) WYYYearRange yearRange;
 
 /**
  *  @author YYYeung
@@ -83,16 +101,29 @@ typedef enum : NSUInteger {
  */
 @property (nonatomic, assign, readonly) HourFormat hourFormat;
 
+/**
+ *  @author YYYeung
+ *
+ *  @brief Indicates whether the wheels of the picker view should have infinite rows. YES if picker view should have infinite rows, otherwise, NO. Default is YES.
+ */
+@property (nonatomic, assign) BOOL loop;
+
+/**
+ *  @author YYYeung
+ *
+ *  @brief Indicates whether confirm and cancel button should show up. YES if confirm and cancel button should show up, otherwise, NO.
+ */
 @property (nonatomic, assign) BOOL needConfirmCancel;
+
 @property (nonatomic, weak) id<WYYDateTimePickerDelegate> dateTimeDelegate;
 
 #pragma mark - Data Source
-@property (nonatomic, strong) NSArray *years;
-@property (nonatomic, strong) NSArray *months;
-@property (nonatomic, strong) NSArray *days;
-@property (nonatomic, strong) NSArray *hours;
-@property (nonatomic, strong) NSArray *minutes;
-@property (nonatomic, strong) NSArray *seconds;
+@property (nonatomic, strong) NSArray<NSString *> *years;
+@property (nonatomic, strong) NSArray<NSString *> *months;
+@property (nonatomic, strong) NSArray<NSString *> *days;
+@property (nonatomic, strong) NSArray<NSString *> *hours;
+@property (nonatomic, strong) NSArray<NSString *> *minutes;
+@property (nonatomic, strong) NSArray<NSString *> *seconds;
 
 #pragma mark - Controls
 @property (nonatomic, strong) UIPickerView *pickerView;
@@ -103,9 +134,18 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) NSDictionary     *titleAttributes;
 @property (nonatomic, strong) NSDateComponents *dateComponent;
 
+#pragma mark - Blocks
+@property (nonatomic, copy) DateTimePickerValueAMPMDidChange      dateTimePickerValueAMPMDidChange;
+@property (nonatomic, copy) DateTimePickerValueDidChange          dateTimePickerValueDidChange;
+@property (nonatomic, copy) DateTimePickerSelectedValueDidConfirm dateTimePickerSelectedValueDidConfirm;
+@property (nonatomic, copy) DateTimePickerSelectedValueDidCancel  dateTimePickerSelectedValueDidCancel;
+
 #pragma mark - Initializer
-+ (instancetype)pickerWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel;
-- (instancetype)initWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel;
++ (instancetype)pickerWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel yearRange:(WYYYearRange)range initialDate:(NSDate *)initialDate;
++ (instancetype)pickerWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel yearRange:(WYYYearRange)range initialDate:(NSDate *)initialDate valueDidChanged:(DateTimePickerValueDidChange)valueDidChange selectedValueDidConfirm:(DateTimePickerSelectedValueDidConfirm)selectedValueDidConfirm selectedValueDidCancel:(DateTimePickerSelectedValueDidCancel)selectedValueDidCancel;
+
+- (instancetype)initWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel yearRange:(WYYYearRange)range initialDate:(NSDate *)initialDate;
+- (instancetype)initWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel yearRange:(WYYYearRange)range initialDate:(NSDate *)initialDate valueDidChanged:(DateTimePickerValueDidChange)valueDidChange selectedValueDidConfirm:(DateTimePickerSelectedValueDidConfirm)selectedValueDidConfirm selectedValueDidCancel:(DateTimePickerSelectedValueDidCancel)selectedValueDidCancel;
 
 #pragma mark - Other Methods
 - (void)setupSubviews;

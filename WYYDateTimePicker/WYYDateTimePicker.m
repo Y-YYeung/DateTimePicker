@@ -22,7 +22,11 @@
     return nil;
 }
 
-+ (instancetype)pickerWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel{
++ (instancetype)pickerWithHeight:(CGFloat)height
+                      hourFormat:(HourFormat)hourFormat
+               needConfirmCancel:(BOOL)needConfirmCancel
+                       yearRange:(WYYYearRange)range
+                     initialDate:(NSDate *)initialDate{
     Class class = nil;
     if (hourFormat == HourFormat12) {
         class = NSClassFromString(@"WYYDateTime12HourPicker");
@@ -30,17 +34,82 @@
         class = NSClassFromString(@"WYYDateTime24HourPicker");
     }
     
-    return [[class alloc] initWithHeight:height hourFormat:hourFormat needConfirmCancel:needConfirmCancel];
+    return [[class alloc] initWithHeight:height
+                              hourFormat:hourFormat
+                       needConfirmCancel:needConfirmCancel
+                               yearRange:range
+                             initialDate:initialDate];
 }
 
-- (instancetype)initWithHeight:(CGFloat)height hourFormat:(HourFormat)hourFormat needConfirmCancel:(BOOL)needConfirmCancel{
++ (instancetype)pickerWithHeight:(CGFloat)height
+                      hourFormat:(HourFormat)hourFormat
+               needConfirmCancel:(BOOL)needConfirmCancel
+                       yearRange:(WYYYearRange)range
+                     initialDate:(NSDate *)initialDate
+                 valueDidChanged:(DateTimePickerValueDidChange)valueDidChange
+         selectedValueDidConfirm:(DateTimePickerSelectedValueDidConfirm)selectedValueDidConfirm
+          selectedValueDidCancel:(DateTimePickerSelectedValueDidCancel)selectedValueDidCancel{
+    
+    Class class = nil;
+    if (hourFormat == HourFormat12) {
+        class = NSClassFromString(@"WYYDateTime12HourPicker");
+    } else {
+        class = NSClassFromString(@"WYYDateTime24HourPicker");
+    }
+    
+    return [[class alloc] initWithHeight:height
+                              hourFormat:hourFormat
+                       needConfirmCancel:needConfirmCancel
+                               yearRange:range
+                             initialDate:initialDate
+                         valueDidChanged:valueDidChange
+                 selectedValueDidConfirm:selectedValueDidConfirm
+                  selectedValueDidCancel:selectedValueDidCancel];
+}
+
+- (instancetype)initWithHeight:(CGFloat)height
+                    hourFormat:(HourFormat)hourFormat
+             needConfirmCancel:(BOOL)needConfirmCancel
+                     yearRange:(WYYYearRange)range
+                   initialDate:(NSDate *)initialDate{
+    
     self = [super initWithFrame:CGRectMake(0, 0, CGRectGetWidth([UIScreen mainScreen].bounds), height)];
     if (self) {
         self.hourFormat = hourFormat;
+        self.yearRange = range;
         self.needConfirmCancel = needConfirmCancel;
     }
     
     return self;
+}
+
+- (instancetype)initWithHeight:(CGFloat)height
+                    hourFormat:(HourFormat)hourFormat
+             needConfirmCancel:(BOOL)needConfirmCancel
+                     yearRange:(WYYYearRange)range
+                   initialDate:(NSDate *)initialDate
+               valueDidChanged:(DateTimePickerValueDidChange)valueDidChange
+       selectedValueDidConfirm:(DateTimePickerSelectedValueDidConfirm)selectedValueDidConfirm
+        selectedValueDidCancel:(DateTimePickerSelectedValueDidCancel)selectedValueDidCancel{
+    
+    self = [super initWithFrame:CGRectMake(0, 0, CGRectGetWidth([UIScreen mainScreen].bounds), height)];
+    if (self) {
+        self.hourFormat                            = hourFormat;
+        self.needConfirmCancel                     = needConfirmCancel;
+        self.yearRange                             = range;
+        self.dateTimePickerValueDidChange          = valueDidChange;
+        self.dateTimePickerSelectedValueDidConfirm = selectedValueDidConfirm;
+        self.dateTimePickerSelectedValueDidCancel  = selectedValueDidCancel;
+    }
+    
+    return self;
+}
+
+- (void)dealloc{
+    self.dateTimePickerValueAMPMDidChange      = nil;
+    self.dateTimePickerValueDidChange          = nil;
+    self.dateTimePickerSelectedValueDidCancel  = nil;
+    self.dateTimePickerSelectedValueDidConfirm = nil;
 }
 
 #pragma mark - View Helpers
@@ -50,8 +119,7 @@
 
 #pragma mark - Helpers
 - (void)configureDefaultValue{
-    self.startYear  = 1970;
-    self.endYear    = 2029;
+    self.loop = YES;
 }
 
 - (BOOL)dateValidWithYear:(NSString *)year month:(NSString *)month day:(NSString *)day{
@@ -75,14 +143,24 @@
 }
 
 - (void)confirmAction:(UIBarButtonItem *)sender{
-    if ([self.dateTimeDelegate respondsToSelector:@selector(dateTimePicker:didConfirmSelectedDateTime:)] && self.needConfirmCancel) {
-        [self.dateTimeDelegate dateTimePicker:self didConfirmSelectedDateTime:self.selectedDate];
+    
+    if (self.needConfirmCancel) {
+        if ([self.dateTimeDelegate respondsToSelector:@selector(dateTimePicker:didConfirmSelectedDateTime:)]) {
+            [self.dateTimeDelegate dateTimePicker:self didConfirmSelectedDateTime:self.selectedDate];
+        } else if (self.dateTimePickerSelectedValueDidConfirm) {
+            self.dateTimePickerSelectedValueDidConfirm(self, self.selectedDate);
+        }
     }
 }
 
 - (void)cancelAction:(UIBarButtonItem *)sender{
-    if ([self.dateTimeDelegate respondsToSelector:@selector(dateTimePicker:didCancelSelectedDateTiem:)] && self.needConfirmCancel) {
-        [self.dateTimeDelegate dateTimePicker:self didCancelSelectedDateTiem:self.selectedDate];
+    
+    if (self.needConfirmCancel) {
+        if ([self.dateTimeDelegate respondsToSelector:@selector(dateTimePicker:didCancelSelectedDateTiem:)]) {
+            [self.dateTimeDelegate dateTimePicker:self didCancelSelectedDateTiem:self.selectedDate];
+        } else if (self.dateTimePickerSelectedValueDidCancel) {
+            self.dateTimePickerSelectedValueDidCancel(self, self.selectedDate);
+        }
     }
 }
 
@@ -90,7 +168,7 @@
 + (NSArray *)generateSequenceFrom:(NSInteger)from to:(NSInteger)to{
     NSMutableArray *sequence = [NSMutableArray array];
     for (NSInteger i = from; i <= to; i++) {
-        [sequence addObject:[NSString stringWithFormat:@"%ld", i]];
+        [sequence addObject:[NSString stringWithFormat:@"%ld", (long)i]];
     }
     
     return [sequence copy];
@@ -106,26 +184,36 @@
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component{
-    switch (component) {
-        case 0:
-            return self.years.count;
-        case 1:
-            return self.months.count;
-        case 2:
-            return self.days.count;
-        case 3:
-            return self.hours.count;
-        case 4:
-        case 6:
+    
+    if (!self.loop) {
+        switch (component) {
+            case 0:
+                return self.years.count;
+            case 1:
+                return self.months.count;
+            case 2:
+                return self.days.count;
+            case 3:
+                return self.hours.count;
+            case 4:
+            case 6:
+                return 1;
+            case 5:
+                return self.minutes.count;
+            case 7:
+                return self.seconds.count;
+                
+            default:
+                return 0;
+        }
+    } else {
+        if (component == 4 || component == 6) {
             return 1;
-        case 5:
-            return self.minutes.count;
-        case 7:
-            return self.seconds.count;
-            
-        default:
-            return 0;
+        }
+        
+        return INT16_MAX;
     }
+    
 }
 
 #pragma mark - Delegate
@@ -156,30 +244,31 @@
     NSString *title = nil;
     switch (component) {
         case 0:
-            title = self.years[row];
+            title = self.years[row % self.years.count];
             break;
         case 1:
-            title = self.months[row];
+            title = self.months[row % self.months.count];
             break;
         case 2:
-            title = self.days[row];
+            title = self.days[row % self.days.count];
             break;
         case 3:
-            title = self.hours[row];
+            title = self.hours[row % self.hours.count];
             break;
         case 4:
         case 6:
             title = @":";
             break;
         case 5:
-            title = self.minutes[row];
+            title = self.minutes[row % self.minutes.count];
             break;
         case 7:
-            title = self.seconds[row];
+            title = self.seconds[row % self.seconds.count];
             break;
             
         default:
-            return nil;
+            title = @".";
+            break;
     }
     
     return [[NSAttributedString alloc] initWithString:title attributes:self.titleAttributes];
@@ -188,9 +277,9 @@
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component{
     
     // Translate year, month and day
-    NSString *year  = self.years[[pickerView selectedRowInComponent:0]];
-    NSString *month = self.months[[pickerView selectedRowInComponent:1]];
-    NSString *day   = self.days[[pickerView selectedRowInComponent:2]];
+    NSString *year  = self.years[[pickerView selectedRowInComponent:0] % self.years.count];
+    NSString *month = self.months[[pickerView selectedRowInComponent:1] % self.months.count];
+    NSString *day   = self.days[[pickerView selectedRowInComponent:2] % self.days.count];
     
     self.dateComponent.year  = year.integerValue;
     self.dateComponent.month = month.integerValue;
@@ -211,16 +300,20 @@
     }
     
     // Date is valid, translate time
+    NSString *hour = self.hours[[pickerView selectedRowInComponent:3] % self.hours.count];
+    NSString *minute = self.minutes[[pickerView selectedRowInComponent:5] % self.minutes.count];
+    NSString *second = self.seconds[[pickerView selectedRowInComponent:7] % self.seconds.count];
+    
+    self.dateComponent.hour   = hour.integerValue;
+    self.dateComponent.minute = minute.integerValue;
+    self.dateComponent.second = second.integerValue;
+    NSDate *date = [self generateLocalDateWithDateComponents:self.dateComponent];
+    self.selectedDate = date;
+    
     if ([self.dateTimeDelegate respondsToSelector:@selector(dateTimePicker:didChangeDateTime:)]) {
-        NSString *hour = self.hours[[pickerView selectedRowInComponent:3]];
-        NSString *minute = self.minutes[[pickerView selectedRowInComponent:5]];
-        NSString *second = self.seconds[[pickerView selectedRowInComponent:7]];
-        
-        self.dateComponent.hour   = hour.integerValue;
-        self.dateComponent.minute = minute.integerValue;
-        self.dateComponent.second = second.integerValue;
-        
-        [self.dateTimeDelegate dateTimePicker:self didChangeDateTime:[self generateLocalDateWithDateComponents:self.dateComponent]];
+        [self.dateTimeDelegate dateTimePicker:self didChangeDateTime:date];
+    } else if (self.dateTimePickerValueDidChange) {
+        self.dateTimePickerValueDidChange(self, date);
     }
 }
 
@@ -236,7 +329,7 @@
 
 - (NSArray *)years{
     if (!_years) {
-        _years = [[self class] generateSequenceFrom:self.startYear to:self.endYear];
+        _years = [[self class] generateSequenceFrom:self.yearRange.startYear to:self.yearRange.endYear];
     }
     
     return _years;
@@ -298,12 +391,10 @@
     return _dateComponent;
 }
 
-- (void)setStartYear:(NSInteger)startYear{
-    _startYear = startYear < 1970 ? 1970 : startYear;
-}
-
-- (void)setEndYear:(NSInteger)endYear{
-    _endYear = endYear < self.startYear ? self.startYear + 59 : endYear;
+- (void)setLoop:(BOOL)loop{
+    _loop = loop;
+    
+    [self.pickerView reloadAllComponents];
 }
 
 @end
