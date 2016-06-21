@@ -125,7 +125,7 @@
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateFormat = [mutableDateFormat copy];
     
-    NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%ld%ld%ld%ld%ld%ld", (long)dateComponents.year, (long)dateComponents.month, dateComponents.day, dateComponents.hour, dateComponents.minute, dateComponents.second]];
+    NSDate *date = [dateFormatter dateFromString:[NSString stringWithFormat:@"%ld%ld%ld%ld%ld%ld", (long)dateComponents.year, (long)dateComponents.month, (long)dateComponents.day, (long)dateComponents.hour, (long)dateComponents.minute, (long)dateComponents.second]];
     self.selectedDate = date;
     
     return date;
